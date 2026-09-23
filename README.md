@@ -110,6 +110,10 @@ Windows через собственный оверлей на Qt; на Wayland �
   <img src="ScreenShots/simple-screenshot_01.png" width="50%">
 </p>
 
+<p align="center">
+  <img src="ScreenShots/simple-screenshot_02.png" width="50%">
+</p>
+
 Donate $5 to buy food for a cat:
 <br>
 USDT(TRC20): TWEmMHfc5DbQuDru8oaXNoXxTNkqYJbsYv<br>
