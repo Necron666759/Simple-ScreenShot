@@ -101,3 +101,17 @@ Windows через собственный оверлей на Qt; на Wayland �
 `slurp` + `grim` (там сразу сохраняет в файл, т.к. slurp уже
 предоставляет свой интерфейс выделения). Реализация — в
 `src/region_overlay.py` и `capture.capture_region()`.
+
+<p align="center">
+  <img src="ScreenShots/simple-screenshot_00.png" width="50%">
+</p>
+
+<p align="center">
+  <img src="ScreenShots/simple-screenshot_01.png" width="50%">
+</p>
+
+Donate $5 to buy food for a cat:
+<br>
+USDT(TRC20): TWEmMHfc5DbQuDru8oaXNoXxTNkqYJbsYv<br>
+BTC(BEP20): 0x147d19ae0e1b50ca6c87d32b2f716068e6ba5b17<br>
+SOL(SOL): j3kkX7VuKfchcnH8Y9bUCbqjjA4ssLpspvsw4YZi8ia<br>
