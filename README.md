@@ -1,35 +1,36 @@
 # Simple Screenshot
 
-Простое приложение для захвата экрана со значком в трее (аналог по духу
-Flameshot, но проще): скриншот одним нажатием, выделение произвольной
-области экрана, выбор папки сохранения, три независимые горячие
-клавиши (сохранение в файл, копирование в буфер обмена, выделение
-области), автозапуск в один клик, форматы PNG/JPG, три уровня качества.
+A simple screen-capture app with a tray icon (in the spirit of
+Flameshot, but simpler): one-click screenshot, interactive region
+selection, choice of save folder, three independent hotkeys (save to
+file, copy to clipboard, select region), one-click autostart, PNG/JPG
+formats, three quality levels.
 
-Код кроссплатформенный и живёт в `src/`. Под каждую ОС — своя папка
-упаковки в `packaging/`.
+The code is cross-platform and lives in `src/`. Each OS has its own
+packaging folder under `packaging/`.
 
 ```
-src/                      — общий кроссплатформенный код (Linux + Windows)
+src/                      — shared cross-platform code (Linux + Windows)
   main.py, config.py, capture.py, tray_app.py, settings_dialog.py, ipc.py
-  hotkey/                 — глобальная горячая клавиша: x11.py (Linux/X11),
-                            windows.py (WinAPI), общий __init__.py-фабрика
-  autostart/              — автозапуск: linux.py (XDG autostart),
-                            windows.py (реестр), общий __init__.py-фабрика
-  assets/                 — иконки (svg для Linux, ico для Windows)
+  i18n.py                 — EN/RU interface translations, language switching
+  hotkey/                 — global hotkey: x11.py (Linux/X11),
+                            windows.py (WinAPI), common __init__.py factory
+  autostart/               — autostart: linux.py (XDG autostart),
+                            windows.py (registry), common __init__.py factory
+  assets/                  — icons (svg for Linux, ico for Windows)
 
 packaging/
-  linux/                  — метаданные .deb (control, .desktop, postinst…)
-    build-deb.sh           <- собирает .deb одной командой (нужен dpkg-deb)
-  windows/                — сборка под Windows
+  linux/                  — .deb metadata (control, .desktop, postinst…)
+    build-deb.sh           <- builds the .deb with one command (needs dpkg-deb)
+  windows/                — Windows build
     simple-screenshot.spec <- PyInstaller
-    installer.iss           <- Inno Setup
-    build.bat               <- полная сборка одной командой на Windows
+    installer.iss            Inno Setup
+    build.bat                full build with one command on Windows
     requirements-windows.txt
-    README-WINDOWS.md       <- подробная инструкция
+    README-WINDOWS.md        detailed instructions
 
 .github/workflows/build-windows.yml
-                          — CI-сборка установщика в облаке (GitHub Actions)
+                          — cloud CI build of the installer (GitHub Actions)
 ```
 
 ## Linux (Debian/Ubuntu)
@@ -40,19 +41,20 @@ cd packaging/linux
 sudo apt install ../../build/simple-screenshot_1.3.2_all.deb
 ```
 
-Зависимости (`python3-pyqt5`, `python3-xlib`) подтянутся из официальных
-репозиториев автоматически.
+Dependencies (`python3-pyqt5`, `python3-xlib`) are pulled automatically
+from the official repositories.
 
 ## Windows 10/11
 
-Установщики (`.exe` через NSIS и `.msi` через WiX/msitools) собираются
-**целиком на Linux**, без единой Windows-машины: PyInstaller запускается
-под Wine поверх настоящего portable Windows Python, а сами установщики —
-уже нативными Linux-утилитами (`makensis`, `wixl`). Подробности,
-проверка и альтернативные способы (GitHub Actions, сборка на реальной
-Windows через Inno Setup) — в `packaging/windows/README-WINDOWS.md`.
+The installers (`.exe` via NSIS and `.msi` via WiX/msitools) are built
+**entirely on Linux**, with no Windows machine required: PyInstaller
+runs under Wine on top of a real portable Windows Python build, and the
+installers themselves are produced by native Linux utilities
+(`makensis`, `wixl`). Details, verification steps and alternative
+approaches (GitHub Actions, building on real Windows via Inno Setup)
+are in `packaging/windows/README-WINDOWS.md`.
 
-Сборка одной командой (на Debian/Ubuntu):
+One-command build (on Debian/Ubuntu):
 
 ```bash
 sudo dpkg --add-architecture i386
@@ -62,45 +64,53 @@ cd packaging/windows
 ./build-linux.sh
 ```
 
-Результат — в `packaging/windows/dist/`: `SimpleScreenshot.exe`,
+The result lands in `packaging/windows/dist/`: `SimpleScreenshot.exe`,
 `SimpleScreenshot-Setup-1.3.2.exe`, `SimpleScreenshot-1.3.2.msi`.
 
-## Поддержка окружений
+## Environment support
 
-- **X11** (любое DE: XFCE, GNOME on Xorg, KDE Plasma on Xorg, Budgie,
-  MATE, Cinnamon…) — полная поддержка, включая обе глобальные горячие
-  клавиши (сохранение в файл и копирование в буфер обмена).
-- **Wayland** — захват через `grim` (если установлен); горячие клавиши
-  назначаются средствами самого окружения на команды
-  `simple-screenshot --capture` (сохранить в файл) и
-  `simple-screenshot --copy` (скопировать в буфер обмена) — ограничение
-  протокола Wayland на глобальный перехват клавиш, не зависит от
-  приложения. Буфер обмена при этом работает как обычно (это отдельный
-  от захвата экрана механизм Qt).
-- **Windows 10/11** — полная поддержка через Qt-захват экрана и Qt же
-  буфер обмена, `RegisterHotKey` (WinAPI, независимо для обеих клавиш)
-  и автозапуск через реестр.
+- **X11** (any DE: XFCE, GNOME on Xorg, KDE Plasma on Xorg, Budgie,
+  MATE, Cinnamon…) — full support, including both global hotkeys
+  (save to file and copy to clipboard).
+- **Wayland** — capture via `grim` (if installed); hotkeys are assigned
+  through the desktop environment's own settings, bound to the
+  commands `simple-screenshot --capture` (save to file) and
+  `simple-screenshot --copy` (copy to clipboard) — this is a
+  restriction of the Wayland protocol on global key interception, not
+  an app limitation. The clipboard still works as usual (it's a
+  separate Qt mechanism from screen capture).
+- **Windows 10/11** — full support via Qt screen capture and the Qt
+  clipboard, `RegisterHotKey` (WinAPI, independent for both keys) and
+  autostart via the registry.
 
-## Новое: копирование в буфер обмена
+## Interface language: English / Russian
 
-Помимо сохранения в файл, теперь можно скопировать снимок сразу в
-буфер обмена — по отдельной, независимо настраиваемой горячей клавише
-(по умолчанию `Ctrl+Print`, меняется в «Настройки…» → «Горячие
-клавиши»). Также доступно из меню трея пунктом «Скопировать снимок в
-буфер обмена». Проверка на совпадение обеих комбинаций встроена в
-диалог настроек.
+The interface is available in English (default) and Russian. Switch
+languages from "Settings…" — the EN/RU toggle sits right next to the
+"Browse" button. Switching applies instantly, without pressing "Save",
+and updates the tray menu and notifications as well. The choice is
+remembered in the config for next launch. Implementation is in
+`src/i18n.py`.
 
-## Новое: выделение области экрана
+## New: copy to clipboard
 
-Третья независимая горячая клавиша (по умолчанию `Shift+Print`)
-открывает интерактивное выделение прямоугольной области экрана мышью
-(полупрозрачный оверлей поверх снимка, как в Flameshot). После
-выделения появляется маленькая панель с выбором действия —
-«Сохранить» / «Копировать» / отмена (✕ или Esc). Работает на X11 и
-Windows через собственный оверлей на Qt; на Wayland — через связку
-`slurp` + `grim` (там сразу сохраняет в файл, т.к. slurp уже
-предоставляет свой интерфейс выделения). Реализация — в
-`src/region_overlay.py` и `capture.capture_region()`.
+Besides saving to a file, you can now copy a screenshot straight to
+the clipboard — via a separate, independently configurable hotkey
+(`Ctrl+Print` by default, changeable in "Settings…" → "Hotkeys"). Also
+available from the tray menu as "Copy screenshot to clipboard". The
+settings dialog checks that the two combinations don't collide.
+
+## New: screen region selection
+
+A third independent hotkey (`Shift+Print` by default) opens an
+interactive rectangular region selection with the mouse (a
+semi-transparent overlay on top of the capture, like in Flameshot).
+After selecting, a small action panel appears — "Save" / "Copy" /
+cancel (✕ or Esc). Works on X11 and Windows through a custom Qt
+overlay; on Wayland — via `slurp` + `grim` (there it saves straight to
+a file, since slurp already provides its own selection UI).
+Implementation is in `src/region_overlay.py` and
+`capture.capture_region()`.
 
 <p align="center">
   <img src="ScreenShots/simple-screenshot_00.png" width="50%">
