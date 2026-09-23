@@ -103,9 +103,9 @@ Windows через собственный оверлей на Qt; на Wayland �
 `src/region_overlay.py` и `capture.capture_region()`.
 
 <p align="center">
-  <img src="ScreenShots/Image_00.png" width="50%">
+  <img src="ScreenShots/image_00.png" width="50%">
 </p>
 
 <p align="center">
-  <img src="ScreenShots/Image_01.png" width="50%">
+  <img src="ScreenShots/image_01.png" width="50%">
 </p>
