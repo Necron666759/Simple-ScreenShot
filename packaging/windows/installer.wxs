@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Скрипт WiX для сборки Simple Screenshot.msi через wixl (пакет msitools),
+  который компилирует .wxs в .msi НАТИВНО на Linux, без Wine и без
+  реального WiX Toolset. Сборка:
+      wixl -v -o dist/SimpleScreenshot-1.3.1.msi installer.wxs
+  (см. build-linux.sh)
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*"
+           Name="Simple Screenshot"
+           Language="1049"
+           Version="1.3.1.0"
+           Manufacturer="Simple Screenshot Project"
+           UpgradeCode="7C1F2B7E-9C2A-4B1E-8F0A-2E4B7C9A1D01">
+
+    <Package InstallerVersion="500"
+             Compressed="yes"
+             InstallScope="perUser"
+             Description="Установщик Simple Screenshot"
+             Comments="Простой захват экрана со значком в трее" />
+
+    <MajorUpgrade DowngradeErrorMessage
+      ="Уже установлена более новая версия Simple Screenshot." />
+
+    <Media Id="1" Cabinet="app.cab" EmbedCab="yes" />
+
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="ARPNOREPAIR" Value="1" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="LocalAppDataFolder">
+        <Directory Id="INSTALLDIR" Name="SimpleScreenshot">
+          <Component Id="MainExecutable" Guid="4E2F0C1A-6B3D-4E7A-9C2F-1A2B3C4D5E01">
+            <File Id="SimpleScreenshotEXE"
+                  Source="dist/SimpleScreenshot.exe"
+                  KeyPath="yes" />
+          </Component>
+
+          <Component Id="AutostartRegistry" Guid="8A9B0C1D-2E3F-4A5B-8C6D-7E8F9A0B1C02">
+            <RegistryValue Root="HKCU"
+                           Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                           Name="SimpleScreenshot"
+                           Type="string"
+                           Value="[INSTALLDIR]SimpleScreenshot.exe"
+                           KeyPath="yes" />
+            <!-- По умолчанию НЕ ставится: значение пишет сама программа
+                 при включении автозапуска из настроек. Компонент
+                 присутствует, чтобы MSI мог его аккуратно убрать при
+                 удалении, если пользователь включал автозапуск. -->
+          </Component>
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="AppProgramsFolder" Name="Simple Screenshot">
+          <Component Id="StartMenuShortcut" Guid="1B2C3D4E-5F6A-4B7C-8D9E-0F1A2B3C4D03">
+            <Shortcut Id="StartMenuShortcutFile"
+                      Name="Simple Screenshot"
+                      Description="Простой захват экрана"
+                      Target="[INSTALLDIR]SimpleScreenshot.exe"
+                      WorkingDirectory="INSTALLDIR" />
+            <RemoveFolder Id="RemoveAppProgramsFolder" On="uninstall" />
+            <RegistryValue Root="HKCU"
+                           Key="Software\SimpleScreenshot"
+                           Name="installed"
+                           Type="integer"
+                           Value="1"
+                           KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+
+      <Directory Id="DesktopFolder">
+        <Component Id="DesktopShortcut" Guid="2C3D4E5F-6A7B-4C8D-9E0F-1A2B3C4D5E04">
+          <Shortcut Id="DesktopShortcutFile"
+                    Name="Simple Screenshot"
+                    Description="Простой захват экрана"
+                    Target="[INSTALLDIR]SimpleScreenshot.exe"
+                    WorkingDirectory="INSTALLDIR" />
+          <RegistryValue Root="HKCU"
+                         Key="Software\SimpleScreenshot"
+                         Name="desktop_shortcut"
+                         Type="integer"
+                         Value="1"
+                         KeyPath="yes" />
+        </Component>
+      </Directory>
+    </Directory>
+
+    <Feature Id="MainFeature" Title="Simple Screenshot" Level="1">
+      <ComponentRef Id="MainExecutable" />
+      <ComponentRef Id="AutostartRegistry" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+
+    <Icon Id="AppIcon" SourceFile="../../src/assets/simple-screenshot.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+  </Product>
+</Wix>

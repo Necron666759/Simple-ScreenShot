@@ -1,0 +1,2 @@
+class HotkeyError(Exception):
+    pass
